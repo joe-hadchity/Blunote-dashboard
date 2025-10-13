@@ -8,9 +8,9 @@ import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Next.js Modals | TailAdmin - Next.js Dashboard Template",
+  title: "Modal Components | Bluenote - UI Components",
   description:
-    "This is Next.js Modals page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    "Explore Bluenote's modal component examples and demonstrations. See different modal types, forms, alerts, and interactive dialogs used in the application.",
   // other metadata
 };
 

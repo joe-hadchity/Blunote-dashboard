@@ -2,19 +2,20 @@
 
 import React, { useState, useMemo } from "react";
 import { Menu } from "@headlessui/react";
+import { useRouter } from "next/navigation";
 // We are no longer importing custom table components
 import Badge from "../ui/badge/Badge";
 
 
 // Interface for a recorded meeting
-interface Meeting {
+export interface Meeting {
   id: number;
   title: string;
   date: string;
   lastModified: string;
   duration: string;
   type: "video" | "audio";
-  platform: "Google Meet" | "Zoom" | "Microsoft Teams" | "Slack";
+  platform: "Google Meet" | "Zoom" | "Microsoft Teams" | "Slack" | "Scheduled Meeting";
   features: ("Transcript" | "Summary" | "Video File")[];
   isFavorite?: boolean;
 }
@@ -112,6 +113,7 @@ const initialFilterState = {
 };
 
 export default function MeetingsHistoryTable() {
+  const router = useRouter();
   const [meetings, setMeetings] = useState<Meeting[]>(initialTableData);
   const [filters, setFilters] = useState(initialFilterState);
   const [sort, setSort] = useState({ by: 'date', order: 'desc' });
@@ -134,7 +136,7 @@ export default function MeetingsHistoryTable() {
   const handleClearFilters = () => setFilters(initialFilterState);
   
   const handleRowClick = (id: number) => {
-    console.log("Navigate to meeting details for ID:", id);
+    router.push(`/meeting/${id}`);
   };
 
   const handleDeleteMeeting = (id: number) => setMeetings(prev => prev.filter(m => m.id !== id));

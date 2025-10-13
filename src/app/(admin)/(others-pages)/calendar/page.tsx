@@ -4,16 +4,16 @@ import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Next.js Calender | TailAdmin - Next.js Dashboard Template",
+  title: "Upcomings | Bluenote - AI-Powered Meeting Assistant",
   description:
-    "This is Next.js Calender page for TailAdmin  Tailwind CSS Admin Dashboard Template",
+    "Manage your meetings and schedule with Bluenote's intelligent calendar. View upcoming meetings, sync with multiple platforms, and access AI-powered meeting insights.",
   // other metadata
 };
 export default function page() {
   return (
-    <div>
-      <PageBreadcrumb pageTitle="Calendar" />
+    <>
+      <PageBreadcrumb pageTitle="Upcomings" />
       <Calendar />
-    </div>
+    </>
   );
 }

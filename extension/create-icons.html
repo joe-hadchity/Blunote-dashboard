@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Icon Generator - Bluenote</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    h1 { color: #667eea; }
+    .canvas-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+    canvas {
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+    }
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+    button:hover { background: #5568d3; }
+    .info {
+      background: #f0fdf4;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 4px solid #22c55e;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎙️ Bluenote Extension Icon Generator</h1>
+  
+  <div class="info">
+    <strong>Instructions:</strong><br>
+    1. Icons will be generated below<br>
+    2. Right-click each icon → "Save image as..."<br>
+    3. Save with exact names: icon16.png, icon32.png, icon48.png, icon128.png<br>
+    4. Put them in the <code>extension/icons/</code> folder
+  </div>
+  
+  <button onclick="generateIcons()">Generate Icons</button>
+  <button onclick="downloadAll()">Download All (ZIP)</button>
+  
+  <div class="canvas-container" id="canvases"></div>
+  
+  <script>
+    const sizes = [16, 32, 48, 128];
+    let canvases = {};
+    
+    function generateIcons() {
+      const container = document.getElementById('canvases');
+      container.innerHTML = '';
+      
+      sizes.forEach(size => {
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        canvas.id = `icon${size}`;
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Background gradient
+        const gradient = ctx.createLinearGradient(0, 0, size, size);
+        gradient.addColorStop(0, '#667eea');
+        gradient.addColorStop(1, '#764ba2');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, size, size);
+        
+        // Microphone icon (simplified)
+        ctx.fillStyle = 'white';
+        
+        const scale = size / 128;
+        const centerX = size / 2;
+        const centerY = size / 2;
+        
+        // Microphone body
+        ctx.beginPath();
+        ctx.arc(centerX, centerY - 10 * scale, 15 * scale, Math.PI, 0, false);
+        ctx.rect(centerX - 15 * scale, centerY - 10 * scale, 30 * scale, 25 * scale);
+        ctx.fill();
+        
+        // Microphone stand
+        ctx.fillRect(centerX - 2 * scale, centerY + 15 * scale, 4 * scale, 15 * scale);
+        ctx.fillRect(centerX - 12 * scale, centerY + 28 * scale, 24 * scale, 4 * scale);
+        
+        // Add to container
+        const wrapper = document.createElement('div');
+        wrapper.style.textAlign = 'center';
+        wrapper.innerHTML = `<div>${size}x${size}</div>`;
+        wrapper.appendChild(canvas);
+        container.appendChild(wrapper);
+        
+        canvases[size] = canvas;
+      });
+    }
+    
+    function downloadAll() {
+      Object.entries(canvases).forEach(([size, canvas]) => {
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `icon${size}.png`;
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+      });
+      
+      alert('Downloading all icons! Save them to extension/icons/ folder');
+    }
+    
+    // Auto-generate on load
+    window.onload = generateIcons;
+  </script>
+</body>
+</html>
+
+
+
+

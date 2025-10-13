@@ -4,7 +4,7 @@
 
 @theme {
   --font-*: initial;
-  --font-outfit: Outfit, sans-serif;
+  --font-inter: Inter, sans-serif;
 
   --breakpoint-*: initial;
   --breakpoint-2xsm: 375px;
@@ -134,6 +134,12 @@
 
   --color-theme-purple-500: #7a5af8;
 
+  --color-primary: #465fff;
+  --color-primary-50: #f2f7ff;
+  --color-primary-100: #dde9ff;
+  --color-primary-500: #465fff;
+  --color-primary-600: #3641f5;
+
   --shadow-theme-md:
     0px 4px 8px -2px rgba(16, 24, 40, 0.1),
     0px 2px 4px -2px rgba(16, 24, 40, 0.06);
@@ -188,12 +194,12 @@
     cursor: pointer;
   }
   body {
-    @apply relative font-normal font-outfit z-1 bg-gray-50;
+    @apply relative font-normal font-inter z-1 bg-gray-50;
   }
 }
 
 @utility menu-item {
-  @apply relative flex items-center w-full gap-3 px-3 py-2 font-medium rounded-lg text-theme-sm;
+  @apply relative flex items-center w-full gap-4 px-4 py-4 font-medium rounded-lg text-base;
 }
 
 @utility menu-item-active {
@@ -229,7 +235,7 @@
 }
 
 @utility menu-dropdown-item {
-  @apply relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-theme-sm font-medium;
+  @apply relative flex items-center gap-4 rounded-lg px-4 py-3 text-base font-medium;
 }
 
 @utility menu-dropdown-item-active {
@@ -259,6 +265,22 @@
   }
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+
+@utility scrollbar-hide {
+  /* Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+@utility line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 @utility custom-scrollbar {
@@ -293,40 +315,6 @@
 }
 
 /* third-party libraries CSS */
-.apexcharts-legend-text {
-  @apply !text-gray-700 dark:!text-gray-400;
-}
-
-.apexcharts-text {
-  @apply !fill-gray-700 dark:!fill-gray-400;
-}
-
-.apexcharts-tooltip.apexcharts-theme-light {
-  @apply gap-1 !rounded-lg !border-gray-200 p-3 !shadow-theme-sm dark:!border-gray-800 dark:!bg-gray-900;
-}
-
-.apexcharts-legend-text {
-  @apply pl-5! !text-gray-700 dark:!text-gray-400;
-}
-.apexcharts-tooltip-series-group {
-  @apply !p-0;
-}
-.apexcharts-tooltip-y-group {
-  @apply !p-0;
-}
-.apexcharts-tooltip-title {
-  @apply !mb-0 !border-b-0 !bg-transparent !p-0 !text-[10px] !leading-4 !text-gray-800 dark:!text-white/90;
-}
-.apexcharts-tooltip-text {
-  @apply !text-theme-xs !text-gray-700 dark:!text-white/90;
-}
-.apexcharts-tooltip-text-y-value {
-  @apply !font-medium;
-}
-
-.apexcharts-gridline {
-  @apply !stroke-gray-100 dark:!stroke-gray-800;
-}
 
 .flatpickr-wrapper {
   @apply w-full;
@@ -480,7 +468,7 @@ span.flatpickr-weekday,
 }
 
 .fc .fc-view-harness {
-  @apply max-w-full overflow-x-auto custom-scrollbar;
+  @apply max-w-full;
 }
 .fc-dayGridMonth-view.fc-view.fc-daygrid {
   @apply min-w-[718px];
@@ -493,13 +481,13 @@ span.flatpickr-weekday,
   border-left-width: 0;
 }
 .fc .fc-toolbar.fc-header-toolbar {
-  @apply flex-col gap-4 px-6 pt-6 sm:flex-row;
+  @apply flex-col gap-3 px-4 pt-4 sm:flex-row;
 }
 .fc-button-group {
   @apply gap-2;
 }
 .fc-button-group .fc-button {
-  @apply flex h-10 w-10 items-center justify-center !rounded-lg border border-gray-200 bg-transparent hover:border-gray-200 hover:bg-gray-50 focus:shadow-none active:!border-gray-200 active:!bg-transparent active:!shadow-none dark:border-gray-800 dark:hover:border-gray-800 dark:hover:bg-gray-900 dark:active:border-gray-800!;
+  @apply flex h-9 w-9 items-center justify-center !rounded-md border border-gray-200 bg-transparent hover:bg-gray-50 focus:shadow-none active:!bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 dark:active:!bg-gray-700;
 }
 
 .fc-button-group .fc-button.fc-prev-button:before {
@@ -520,21 +508,26 @@ span.flatpickr-weekday,
   @apply hidden;
 }
 .fc-addEventButton-button {
-  @apply !rounded-lg !border-0 !bg-brand-500 !px-4 !py-2.5 !text-sm !font-medium hover:!bg-brand-600 focus:!shadow-none;
+  @apply !rounded-lg !border-0 !bg-blue-600 hover:!bg-blue-700 !px-4 !py-2 !text-sm !font-semibold !text-white !shadow-sm hover:!shadow-md !transition-all !duration-150 focus:!outline-none focus:!ring-2 focus:!ring-blue-500 focus:!ring-offset-2 dark:focus:!ring-offset-gray-900;
+  letter-spacing: 0.01em;
+}
+.fc-addEventButton-button:active {
+  @apply !bg-blue-800 !shadow-sm;
+  transform: translateY(1px);
 }
 .fc-toolbar-title {
-  @apply !text-lg !font-medium text-gray-800 dark:text-white/90;
+  @apply !text-base !font-semibold text-gray-800 dark:text-white/90;
 }
 .fc-header-toolbar.fc-toolbar .fc-toolbar-chunk:last-child {
-  @apply rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900;
+  @apply rounded-md bg-gray-50 p-0.5 dark:bg-gray-800;
 }
 .fc-header-toolbar.fc-toolbar .fc-toolbar-chunk:last-child .fc-button {
-  @apply !h-auto !w-auto rounded-md !border-0 bg-transparent !px-5 !py-2 text-sm font-medium text-gray-500 hover:text-gray-700 focus:shadow-none! dark:text-gray-400;
+  @apply !h-auto !w-auto rounded !border-0 bg-transparent !px-4 !py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 focus:shadow-none! dark:text-gray-400;
 }
 .fc-header-toolbar.fc-toolbar
   .fc-toolbar-chunk:last-child
   .fc-button.fc-button-active {
-  @apply text-gray-900 bg-white dark:bg-gray-800 dark:text-white;
+  @apply text-gray-900 bg-white dark:bg-gray-700 dark:text-white;
 }
 .fc-theme-standard th {
   @apply !border-x-0 border-t !border-gray-200 bg-gray-50 !text-left dark:!border-gray-800 dark:bg-gray-900;
@@ -544,19 +537,25 @@ span.flatpickr-weekday,
   @apply !border-gray-200 dark:!border-gray-800;
 }
 .fc .fc-col-header-cell-cushion {
-  @apply !px-5 !py-4 text-sm font-medium uppercase text-gray-400;
+  @apply !px-3 !py-2 text-xs font-medium uppercase text-gray-500 dark:text-gray-500;
 }
 .fc .fc-daygrid-day.fc-day-today {
   @apply bg-transparent;
 }
 .fc .fc-daygrid-day {
-  @apply p-2;
+  @apply p-1;
+}
+.fc .fc-daygrid-day-frame {
+  @apply min-h-[80px];
+}
+.fc .fc-daygrid-day-events {
+  @apply mt-1;
 }
 .fc .fc-daygrid-day.fc-day-today .fc-scrollgrid-sync-inner {
-  @apply rounded-sm bg-gray-100 dark:bg-white/[0.03];
+  @apply rounded-sm bg-gray-100 dark:bg-gray-800/50;
 }
 .fc .fc-daygrid-day-number {
-  @apply !p-3 text-sm font-medium text-gray-700 dark:text-gray-400;
+  @apply !p-2 text-xs font-medium text-gray-600 dark:text-gray-400;
 }
 .fc .fc-daygrid-day-top {
   @apply !flex-row;
@@ -567,44 +566,30 @@ span.flatpickr-weekday,
 .fc .fc-day-other .fc-daygrid-day-top .fc-daygrid-day-number {
   @apply text-gray-400 dark:text-white/30;
 }
-.event-fc-color {
-  @apply rounded-lg py-2.5 pl-4 pr-3;
-}
-.event-fc-color .fc-event-title {
-  @apply p-0 text-sm font-normal text-gray-700;
-}
-.fc-daygrid-event-dot {
-  @apply w-1 h-5 ml-0 mr-3 border-none rounded-sm;
-}
 .fc-event {
-  @apply focus:shadow-none;
+  @apply focus:shadow-none cursor-pointer;
+  border: none !important;
 }
+
 .fc-daygrid-event.fc-event-start {
-  @apply !ml-3;
+  @apply !ml-1;
 }
-.event-fc-color.fc-bg-success {
-  @apply border-success-50 bg-success-50;
+
+.fc-daygrid-event {
+  @apply !mb-1;
 }
-.event-fc-color.fc-bg-danger {
-  @apply border-error-50 bg-error-50;
+
+.fc-daygrid-event-harness {
+  @apply !mt-0;
 }
-.event-fc-color.fc-bg-primary {
-  @apply border-brand-50 bg-brand-50;
+
+/* Ensure events fit properly in cells */
+.fc-event-main {
+  @apply overflow-hidden;
 }
-.event-fc-color.fc-bg-warning {
-  @apply border-orange-50 bg-orange-50;
-}
-.event-fc-color.fc-bg-success .fc-daygrid-event-dot {
-  @apply bg-success-500;
-}
-.event-fc-color.fc-bg-danger .fc-daygrid-event-dot {
-  @apply bg-error-500;
-}
-.event-fc-color.fc-bg-primary .fc-daygrid-event-dot {
-  @apply bg-brand-500;
-}
-.event-fc-color.fc-bg-warning .fc-daygrid-event-dot {
-  @apply bg-orange-500;
+
+.fc-daygrid-block-event .fc-event-main {
+  @apply px-0 py-0;
 }
 .fc-direction-ltr .fc-timegrid-slot-label-frame {
   @apply px-3 py-1.5 text-left text-sm font-medium text-gray-500 dark:text-gray-400;
@@ -612,13 +597,244 @@ span.flatpickr-weekday,
 .fc .fc-timegrid-axis-cushion {
   @apply text-sm font-medium text-gray-500 dark:text-gray-400;
 }
+
+/* Optimize slot height for better visibility */
+.custom-calendar .fc-timegrid-slot {
+  height: 2.5rem !important;
+  min-height: 2.5rem !important;
+}
+
+.custom-calendar .fc-timegrid-slot-label {
+  height: 2.5rem !important;
+}
 .custom-calendar .fc-h-event {
   background-color: transparent;
   border: none;
   color: black;
+  margin-bottom: 3px;
+  height: auto !important;
+  min-height: 26px;
 }
+.custom-calendar .fc-daygrid-event {
+  white-space: nowrap;
+  border-radius: 4px;
+  padding: 0;
+  margin: 1px 2px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb !important;
+  box-shadow: none;
+  position: relative;
+}
+
+.dark .custom-calendar .fc-daygrid-event {
+  border: 1px solid #374151;
+  background: #1f2937 !important;
+}
+
+/* Synced events - dotted border style with distinct appearance */
+.custom-calendar .fc-event.synced-event,
+.custom-calendar .fc-daygrid-event.synced-event,
+.custom-calendar .fc-timegrid-event.synced-event {
+  border-style: dashed !important;
+  border-width: 2px !important;
+  border-color: #3b82f6 !important;
+  background: #dbeafe !important;
+  position: relative !important;
+}
+
+.dark .custom-calendar .fc-event.synced-event,
+.dark .custom-calendar .fc-daygrid-event.synced-event,
+.dark .custom-calendar .fc-timegrid-event.synced-event {
+  border-color: #60a5fa !important;
+  background: #1e3a8a !important;
+}
+
+/* Add a small badge indicator for synced events */
+.custom-calendar .fc-event.synced-event::after,
+.custom-calendar .fc-daygrid-event.synced-event::after,
+.custom-calendar .fc-timegrid-event.synced-event::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 5px;
+  height: 5px;
+  background: #3b82f6;
+  border-radius: 50%;
+  border: 1px solid white;
+}
+
+.dark .custom-calendar .fc-event.synced-event::after,
+.dark .custom-calendar .fc-daygrid-event.synced-event::after,
+.dark .custom-calendar .fc-timegrid-event.synced-event::after {
+  background: #60a5fa;
+  border-color: #1e3a8a;
+}
+
+.custom-calendar .fc-event-main {
+  padding: 0;
+}
+
+.custom-calendar .fc-daygrid-event:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  transform: none;
+  transition: all 0.15s ease;
+}
+
+.dark .custom-calendar .fc-daygrid-event:hover {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.1);
+}
+
+/* Time grid event styles for better short duration display */
+.custom-calendar .fc-timegrid-event {
+  border-radius: 4px !important;
+  border: 1px solid #e5e7eb !important;
+  background: #f9fafb !important;
+  box-shadow: none !important;
+  min-height: 40px !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.dark .custom-calendar .fc-timegrid-event {
+  border: 1px solid #374151 !important;
+  background: #1f2937 !important;
+}
+
+.custom-calendar .fc-timegrid-event .fc-event-main {
+  padding: 6px 8px !important;
+  min-height: 40px !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+.custom-calendar .fc-timegrid-event-harness {
+  min-height: 40px !important;
+}
+
+.custom-calendar .fc-timegrid-event-short {
+  min-height: 40px !important;
+}
+
+.custom-calendar .fc-timegrid-event-short .fc-event-main {
+  padding: 4px 8px !important;
+  min-height: 40px !important;
+}
+
+/* Force minimum height for all time grid events */
+.custom-calendar .fc-timegrid-event-harness-inset {
+  min-height: 40px !important;
+}
+
+/* Ensure event content is always visible even for short events */
+.custom-calendar .fc-timegrid-event .fc-event-time,
+.custom-calendar .fc-timegrid-event .fc-event-title {
+  white-space: normal !important;
+  overflow: visible !important;
+  line-height: 1.4 !important;
+  font-size: 12px !important;
+  display: block !important;
+}
+
+.custom-calendar .fc-timegrid-event .fc-event-time {
+  font-weight: 600 !important;
+  margin-bottom: 2px !important;
+}
+
+.custom-calendar .fc-timegrid-event:hover {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+  transform: none;
+  transition: all 0.15s ease;
+  z-index: 4 !important;
+}
+
+.dark .custom-calendar .fc-timegrid-event:hover {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.1) !important;
+}
+
+/* Ensure very short events (less than 15 min) are still visible */
+.custom-calendar .fc-timegrid-event[style*="height"] {
+  min-height: 40px !important;
+  height: max(40px, var(--fc-event-height)) !important;
+}
+
+/* Additional fixes for FullCalendar inline styles */
+.custom-calendar .fc-timegrid-event-harness > .fc-timegrid-event {
+  min-height: 40px !important;
+  max-height: none !important;
+}
+
+.custom-calendar .fc-timegrid-col-events {
+  min-height: 40px !important;
+}
+
+/* Fix for very short duration events that FullCalendar tries to make tiny */
+.custom-calendar .fc-timegrid-event.fc-v-event {
+  min-height: 40px !important;
+}
+
+/* Override FullCalendar's computed styles */
+.custom-calendar .fc-timegrid-event[style] {
+  min-height: 40px !important;
+  height: auto !important;
+}
+
+.custom-calendar .fc-timegrid-event-harness[style] {
+  min-height: 40px !important;
+}
+
+/* Calendar height and scrolling configuration */
 .fc.fc-media-screen {
-  @apply min-h-screen;
+  min-height: auto !important;
+}
+
+.custom-calendar .fc-view-harness {
+  min-height: 650px;
+}
+
+/* Time grid scroller - smooth scrolling */
+.custom-calendar .fc-timegrid .fc-scroller {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scroll-behavior: smooth;
+  max-height: 650px;
+}
+
+/* Custom scrollbar for calendar */
+.custom-calendar .fc-timegrid .fc-scroller::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-calendar .fc-timegrid .fc-scroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-calendar .fc-timegrid .fc-scroller::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.dark .custom-calendar .fc-timegrid .fc-scroller::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.custom-calendar .fc-timegrid .fc-scroller::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.dark .custom-calendar .fc-timegrid .fc-scroller::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Month view - let it grow naturally */
+.custom-calendar .fc-daygrid .fc-scroller {
+  overflow: visible !important;
 }
 
 .input-date-icon::-webkit-inner-spin-button,
@@ -737,4 +953,94 @@ span.flatpickr-weekday,
     0 1px 2px 0 rgba(16, 24, 40, 0.06);
   opacity: 0.8;
   cursor: grabbing; /* Changes the cursor to indicate dragging */
+}
+
+/* Custom NProgress styles */
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: #3b82f6; /* Blue color matching the theme */
+  position: fixed;
+  z-index: 1031;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+}
+
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0px;
+  width: 100px;
+  height: 100%;
+  box-shadow: 0 0 10px #3b82f6, 0 0 5px #3b82f6;
+  opacity: 1.0;
+  transform: rotate(3deg) translate(0px, -4px);
+}
+
+/* Hide spinner completely */
+#nprogress .spinner {
+  display: none !important;
+}
+
+#nprogress .spinner-icon {
+  display: none !important;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  #nprogress .bar {
+    background: #60a5fa; /* Lighter blue for dark mode */
+  }
+  
+  #nprogress .peg {
+    box-shadow: 0 0 10px #60a5fa, 0 0 5px #60a5fa;
+  }
+}
+
+/* ===================================================================
+   Audio Player - Ensure always clickable and functional
+   =================================================================== */
+audio {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  position: relative !important;
+  z-index: 10 !important;
+  display: block !important;
+  width: 100% !important;
+  min-height: 40px !important;
+}
+
+/* Ensure media controls are clickable */
+audio::-webkit-media-controls-panel {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+audio::-webkit-media-controls-play-button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+  pointer-events: auto !important;
+}
+
+audio::-webkit-media-controls-timeline {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+audio::-webkit-media-controls-volume-slider {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+audio::-webkit-media-controls-mute-button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }

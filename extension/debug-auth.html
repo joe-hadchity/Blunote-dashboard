@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bluenote Extension - Auth Debug</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #f9fafb;
+    }
+    h1 { color: #667eea; }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 16px 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .success { background: #d1fae5; border-left: 4px solid #10b981; }
+    .error { background: #fee2e2; border-left: 4px solid #ef4444; }
+    .info { background: #dbeafe; border-left: 4px solid #3b82f6; }
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+    button:hover { background: #5568d3; }
+    pre {
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    .status-indicator.green { background: #22c55e; }
+    .status-indicator.red { background: #ef4444; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Bluenote Extension - Authentication Debug</h1>
+  
+  <div class="card info">
+    <strong>📋 This page helps debug authentication issues</strong>
+    <p style="margin-top: 8px; font-size: 14px;">
+      Check if the extension can access your login session.
+    </p>
+  </div>
+  
+  <button onclick="runTests()">🧪 Run All Tests</button>
+  <button onclick="clearResults()">🗑️ Clear Results</button>
+  
+  <div id="results"></div>
+  
+  <script>
+    const API_URL = 'http://localhost:3000';
+    
+    async function runTests() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<div class="card"><h3>Running tests...</h3></div>';
+      
+      let allResults = '';
+      
+      // Test 1: Check if backend is running
+      allResults += await testBackend();
+      
+      // Test 2: Check cookies
+      allResults += await testCookies();
+      
+      // Test 3: Check auth API
+      allResults += await testAuthAPI();
+      
+      // Test 4: Check extension permissions
+      allResults += await testPermissions();
+      
+      results.innerHTML = allResults;
+    }
+    
+    async function testBackend() {
+      try {
+        const response = await fetch(API_URL);
+        if (response.ok) {
+          return `
+            <div class="card success">
+              <h3><span class="status-indicator green"></span>✅ Backend Running</h3>
+              <p>Your Next.js app is accessible at ${API_URL}</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        return `
+          <div class="card error">
+            <h3><span class="status-indicator red"></span>❌ Backend Not Running</h3>
+            <p><strong>Error:</strong> ${error.message}</p>
+            <p><strong>Fix:</strong> Run <code>npm run dev</code> in your project</p>
+          </div>
+        `;
+      }
+    }
+    
+    async function testCookies() {
+      try {
+        const allCookies = await chrome.cookies.getAll({ url: API_URL });
+        
+        const relevantCookies = allCookies.filter(c => 
+          c.name.includes('token') || 
+          c.name.includes('auth') ||
+          c.name.includes('session') ||
+          c.name.includes('supabase')
+        );
+        
+        if (relevantCookies.length > 0) {
+          return `
+            <div class="card success">
+              <h3><span class="status-indicator green"></span>✅ Cookies Found</h3>
+              <p><strong>Auth cookies detected:</strong></p>
+              <pre>${JSON.stringify(relevantCookies.map(c => ({
+                name: c.name,
+                domain: c.domain,
+                secure: c.secure,
+                hasValue: c.value ? 'Yes' : 'No'
+              })), null, 2)}</pre>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="card error">
+              <h3><span class="status-indicator red"></span>❌ No Auth Cookies</h3>
+              <p>No authentication cookies found for ${API_URL}</p>
+              <p><strong>All cookies:</strong> ${allCookies.map(c => c.name).join(', ') || 'None'}</p>
+              <p><strong>Fix:</strong> Log in to Bluenote in a browser tab first</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        return `
+          <div class="card error">
+            <h3><span class="status-indicator red"></span>❌ Cookie Access Error</h3>
+            <p>${error.message}</p>
+          </div>
+        `;
+      }
+    }
+    
+    async function testAuthAPI() {
+      try {
+        const response = await fetch(`${API_URL}/api/auth/me`, {
+          credentials: 'include',
+          mode: 'cors'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          return `
+            <div class="card success">
+              <h3><span class="status-indicator green"></span>✅ Authentication Works!</h3>
+              <p><strong>Logged in as:</strong> ${data.user?.email || 'Unknown'}</p>
+              <p><strong>User ID:</strong> ${data.user?.id || 'Unknown'}</p>
+              <p>The extension should work correctly!</p>
+            </div>
+          `;
+        } else {
+          const errorText = await response.text();
+          return `
+            <div class="card error">
+              <h3><span class="status-indicator red"></span>❌ Auth API Failed</h3>
+              <p><strong>Status:</strong> ${response.status}</p>
+              <p><strong>Error:</strong> ${errorText}</p>
+              <p><strong>Fix:</strong> Log in to Bluenote first</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        return `
+          <div class="card error">
+            <h3><span class="status-indicator red"></span>❌ Auth API Error</h3>
+            <p>${error.message}</p>
+          </div>
+        `;
+      }
+    }
+    
+    async function testPermissions() {
+      const permissions = await chrome.permissions.getAll();
+      
+      const required = ['tabCapture', 'activeTab', 'storage', 'tabs', 'cookies'];
+      const missing = required.filter(p => !permissions.permissions.includes(p));
+      
+      if (missing.length === 0) {
+        return `
+          <div class="card success">
+            <h3><span class="status-indicator green"></span>✅ All Permissions Granted</h3>
+            <p>Extension has all required permissions</p>
+            <pre>${JSON.stringify(permissions.permissions, null, 2)}</pre>
+          </div>
+        `;
+      } else {
+        return `
+          <div class="card error">
+            <h3><span class="status-indicator red"></span>❌ Missing Permissions</h3>
+            <p><strong>Missing:</strong> ${missing.join(', ')}</p>
+            <p><strong>Fix:</strong> Reinstall the extension</p>
+          </div>
+        `;
+      }
+    }
+    
+    function clearResults() {
+      document.getElementById('results').innerHTML = '';
+    }
+    
+    // Auto-run on load
+    window.onload = () => {
+      setTimeout(runTests, 500);
+    };
+  </script>
+</body>
+</html>
+
+
+
+

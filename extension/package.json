@@ -1,0 +1,14 @@
+{
+  "name": "bluenote-extension",
+  "version": "1.0.0",
+  "description": "Bluenote Chrome Extension with Real-Time Noise Cancellation",
+  "type": "module",
+  "dependencies": {
+    "@rnnoise/rnnoise-wasm": "^0.1.8"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "echo 'Build complete'"
+  }
+}
+

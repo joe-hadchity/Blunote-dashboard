@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Microphone Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+    #visualizer {
+      width: 100%;
+      height: 100px;
+      background: #f3f4f6;
+      border-radius: 8px;
+      margin: 20px 0;
+      display: flex;
+      align-items: flex-end;
+      padding: 10px;
+      gap: 4px;
+    }
+    .bar {
+      flex: 1;
+      background: #3b82f6;
+      border-radius: 2px 2px 0 0;
+      transition: height 0.1s;
+    }
+    #status {
+      padding: 15px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    .info { background: #dbeafe; color: #1e40af; }
+    .success { background: #d1fae5; color: #065f46; }
+    .error { background: #fee2e2; color: #991b1b; }
+    #level {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1f2937;
+      text-align: center;
+      margin: 20px 0;
+    }
+    #log {
+      background: #1f2937;
+      color: #f3f4f6;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+    .log-line {
+      margin: 2px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎙️ Microphone Test</h1>
+    <p>This tests if your microphone works and can be detected by the browser.</p>
+    
+    <button id="startTest">Start Test</button>
+    <button id="stopTest" disabled>Stop Test</button>
+    
+    <div id="status" class="info">Click "Start Test" and allow microphone permission when asked.</div>
+    
+    <div id="level">Audio Level: --</div>
+    
+    <div id="visualizer">
+      <div class="bar" id="bar1"></div>
+      <div class="bar" id="bar2"></div>
+      <div class="bar" id="bar3"></div>
+      <div class="bar" id="bar4"></div>
+      <div class="bar" id="bar5"></div>
+      <div class="bar" id="bar6"></div>
+      <div class="bar" id="bar7"></div>
+      <div class="bar" id="bar8"></div>
+      <div class="bar" id="bar9"></div>
+      <div class="bar" id="bar10"></div>
+    </div>
+    
+    <div id="log"></div>
+  </div>
+
+  <script>
+    let audioContext = null;
+    let analyser = null;
+    let microphone = null;
+    let interval = null;
+    
+    const startBtn = document.getElementById('startTest');
+    const stopBtn = document.getElementById('stopTest');
+    const status = document.getElementById('status');
+    const levelDisplay = document.getElementById('level');
+    const logDiv = document.getElementById('log');
+    
+    function log(message, type = 'info') {
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logDiv.appendChild(line);
+      logDiv.scrollTop = logDiv.scrollHeight;
+      console.log(message);
+    }
+    
+    startBtn.addEventListener('click', async () => {
+      try {
+        log('🎤 Requesting microphone access...');
+        status.className = 'info';
+        status.textContent = 'Requesting microphone permission...';
+        
+        // Get microphone stream
+        microphone = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+        
+        log('✅ Microphone permission GRANTED!');
+        log(`Got ${microphone.getAudioTracks().length} audio track(s)`);
+        
+        const track = microphone.getAudioTracks()[0];
+        log(`Track: ${track.label}`);
+        log(`Enabled: ${track.enabled}, Muted: ${track.muted}, State: ${track.readyState}`);
+        
+        // Create audio context
+        audioContext = new AudioContext();
+        log(`AudioContext created, state: ${audioContext.state}`);
+        
+        if (audioContext.state === 'suspended') {
+          await audioContext.resume();
+          log('AudioContext resumed from suspended state');
+        }
+        
+        // Create analyzer
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        log(`Analyzer created, fftSize: ${analyser.fftSize}`);
+        
+        // Connect microphone to analyzer
+        const source = audioContext.createMediaStreamSource(microphone);
+        source.connect(analyser);
+        log('✅ Microphone connected to analyzer');
+        
+        // Start monitoring
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        log(`Buffer length: ${dataArray.length}`);
+        
+        status.className = 'success';
+        status.textContent = '✅ Microphone is working! Now TALK LOUDLY into your mic!';
+        
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        
+        let sampleNum = 0;
+        interval = setInterval(() => {
+          analyser.getByteFrequencyData(dataArray);
+          
+          let sum = 0;
+          let max = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            sum += dataArray[i];
+            if (dataArray[i] > max) max = dataArray[i];
+          }
+          
+          const avg = sum / dataArray.length;
+          const level = Math.round((avg / 255) * 100);
+          
+          // Update display
+          levelDisplay.textContent = `Audio Level: ${level}%`;
+          levelDisplay.style.color = level > 50 ? '#ef4444' : level > 20 ? '#f59e0b' : '#1f2937';
+          
+          // Update bars
+          const bars = document.querySelectorAll('.bar');
+          bars.forEach((bar, i) => {
+            const threshold = (i + 1) * 10;
+            if (level >= threshold) {
+              bar.style.height = '80px';
+              bar.style.background = level > 70 ? '#ef4444' : level > 40 ? '#f59e0b' : '#3b82f6';
+            } else {
+              bar.style.height = '10px';
+              bar.style.background = '#d1d5db';
+            }
+          });
+          
+          // Log every 2 seconds
+          sampleNum++;
+          if (sampleNum % 4 === 0) {
+            log(`🎵 Level: ${level}%, Avg: ${avg.toFixed(1)}, Max: ${max}`);
+          }
+          
+        }, 500);
+        
+        log('✅ Monitoring started - TALK NOW!');
+        
+      } catch (err) {
+        log(`❌ ERROR: ${err.name} - ${err.message}`, 'error');
+        status.className = 'error';
+        status.textContent = `❌ Error: ${err.message}`;
+        
+        if (err.name === 'NotAllowedError') {
+          log('⚠️ Microphone permission was DENIED!');
+          log('Fix: Click the camera icon in Chrome address bar and allow microphone');
+        } else if (err.name === 'NotFoundError') {
+          log('⚠️ No microphone found on your system!');
+          log('Fix: Connect a microphone and try again');
+        }
+      }
+    });
+    
+    stopBtn.addEventListener('click', () => {
+      if (interval) clearInterval(interval);
+      if (microphone) microphone.getTracks().forEach(t => t.stop());
+      if (audioContext) audioContext.close();
+      
+      log('🛑 Test stopped');
+      status.className = 'info';
+      status.textContent = 'Test stopped. Review the results above.';
+      levelDisplay.textContent = 'Audio Level: --';
+      
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      
+      const bars = document.querySelectorAll('.bar');
+      bars.forEach(bar => {
+        bar.style.height = '10px';
+        bar.style.background = '#d1d5db';
+      });
+    });
+  </script>
+</body>
+</html>
+

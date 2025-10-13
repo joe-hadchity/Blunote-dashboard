@@ -13,7 +13,6 @@ export default function VideoPage() {
   return (
     <div>
       <PageBreadcrumb pageTitle="Videos" />
-
       <VideosExample />
     </div>
   );

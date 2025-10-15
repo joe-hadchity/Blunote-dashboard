@@ -6,17 +6,18 @@ import Link from 'next/link';
 
 export default function AuthCallback() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [message, setMessage] = useState('Verifying your email...');
+  const [message, setMessage] = useState('Processing authentication...');
   const router = useRouter();
 
   useEffect(() => {
-    const verifyEmail = async () => {
+    const handleCallback = async () => {
       try {
         // Get tokens from URL hash (Supabase sends them as #access_token=...)
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const access_token = hashParams.get('access_token');
         const refresh_token = hashParams.get('refresh_token');
         const type = hashParams.get('type');
+        const provider_token = hashParams.get('provider_token');
 
         // Clean up the URL immediately (remove hash)
         if (window.history.replaceState) {
@@ -25,46 +26,82 @@ export default function AuthCallback() {
 
         if (!access_token || !refresh_token) {
           setStatus('error');
-          setMessage('Invalid verification link. Please try again or request a new verification email.');
+          setMessage('Invalid authentication link. Please try again.');
           return;
         }
 
-        // Call our verification API with the tokens
-        const response = await fetch('/api/auth/verify-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({ 
-            access_token, 
-            refresh_token,
-            type: type || 'signup'
-          }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          setStatus('success');
-          setMessage('Email verified successfully! Redirecting...');
+        // Check if this is a Google OAuth callback (has provider_token)
+        if (provider_token) {
+          setMessage('Signing in with Google...');
           
-          // Redirect immediately using window.location for clean navigation
-          setTimeout(() => {
-            window.location.href = '/recordings';
-          }, 1000);
+          // For Google OAuth, call the verify-email endpoint which sets cookies
+          const response = await fetch('/api/auth/verify-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ 
+              access_token, 
+              refresh_token,
+              type: 'oauth'
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            setStatus('success');
+            setMessage('Successfully signed in! Redirecting...');
+            
+            // Redirect to recordings page
+            setTimeout(() => {
+              window.location.href = '/recordings';
+            }, 1000);
+          } else {
+            setStatus('error');
+            setMessage(data.error || 'Sign in failed. Please try again.');
+          }
         } else {
-          setStatus('error');
-          setMessage(data.error || 'Verification failed. Please try again.');
+          // Email verification flow
+          setMessage('Verifying your email...');
+          
+          const response = await fetch('/api/auth/verify-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ 
+              access_token, 
+              refresh_token,
+              type: type || 'signup'
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            setStatus('success');
+            setMessage('Email verified successfully! Redirecting...');
+            
+            // Redirect to recordings page
+            setTimeout(() => {
+              window.location.href = '/recordings';
+            }, 1000);
+          } else {
+            setStatus('error');
+            setMessage(data.error || 'Verification failed. Please try again.');
+          }
         }
       } catch (error) {
-        console.error('Verification error:', error);
+        console.error('Authentication error:', error);
         setStatus('error');
-        setMessage('An error occurred during verification. Please try again.');
+        setMessage('An error occurred during authentication. Please try again.');
       }
     };
 
-    verifyEmail();
+    handleCallback();
   }, [router]);
 
   return (
@@ -97,10 +134,10 @@ export default function AuthCallback() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Verifying Your Email
+                  Processing...
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Please wait a moment...
+                  {message}
                 </p>
               </div>
             </div>
@@ -110,7 +147,7 @@ export default function AuthCallback() {
             <div className="space-y-4">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  ✓ Email Verified
+                  ✓ Success
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {message}
@@ -123,7 +160,7 @@ export default function AuthCallback() {
             <div className="space-y-5">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Verification Failed
+                  Authentication Failed
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {message}

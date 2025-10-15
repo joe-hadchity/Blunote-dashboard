@@ -3,13 +3,17 @@ import { supabase } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
-    const redirectUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    // Get the origin from the request (works in both dev and production)
+    const origin = request.headers.get('origin') || request.nextUrl.origin
+    
+    console.log('Google OAuth - Origin:', origin)
+    console.log('Google OAuth - Redirect URL:', `${origin}/callback`)
     
     // Initiate Google OAuth flow
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${redirectUrl}/callback`,
+        redirectTo: `${origin}/callback`,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',

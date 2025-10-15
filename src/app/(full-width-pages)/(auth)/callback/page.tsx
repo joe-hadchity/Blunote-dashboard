@@ -12,6 +12,9 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
+        console.log('🔍 Callback page - Full URL:', window.location.href);
+        console.log('🔍 Callback page - Hash:', window.location.hash);
+        
         // Get tokens from URL hash (Supabase sends them as #access_token=...)
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const access_token = hashParams.get('access_token');
@@ -19,12 +22,20 @@ export default function AuthCallback() {
         const type = hashParams.get('type');
         const provider_token = hashParams.get('provider_token');
 
+        console.log('🔍 Tokens found:', {
+          has_access_token: !!access_token,
+          has_refresh_token: !!refresh_token,
+          type,
+          has_provider_token: !!provider_token
+        });
+
         // Clean up the URL immediately (remove hash)
         if (window.history.replaceState) {
           window.history.replaceState(null, '', window.location.pathname);
         }
 
         if (!access_token || !refresh_token) {
+          console.error('❌ Missing tokens');
           setStatus('error');
           setMessage('Invalid authentication link. Please try again.');
           return;
@@ -32,6 +43,7 @@ export default function AuthCallback() {
 
         // Check if this is a Google OAuth callback (has provider_token)
         if (provider_token) {
+          console.log('✅ Google OAuth detected');
           setMessage('Signing in with Google...');
           
           // For Google OAuth, call the verify-email endpoint which sets cookies
@@ -49,20 +61,24 @@ export default function AuthCallback() {
           });
 
           const data = await response.json();
+          console.log('📡 OAuth response:', { ok: response.ok, data });
 
           if (response.ok) {
             setStatus('success');
             setMessage('Successfully signed in! Redirecting...');
             
             // Redirect to recordings page
+            console.log('🎯 Redirecting to /recordings');
             setTimeout(() => {
               window.location.href = '/recordings';
-            }, 1000);
+            }, 500);
           } else {
+            console.error('❌ OAuth failed:', data);
             setStatus('error');
             setMessage(data.error || 'Sign in failed. Please try again.');
           }
         } else {
+          console.log('📧 Email verification detected');
           // Email verification flow
           setMessage('Verifying your email...');
           
@@ -80,22 +96,25 @@ export default function AuthCallback() {
           });
 
           const data = await response.json();
+          console.log('📡 Email verification response:', { ok: response.ok, data });
 
           if (response.ok) {
             setStatus('success');
             setMessage('Email verified successfully! Redirecting...');
             
             // Redirect to recordings page
+            console.log('🎯 Redirecting to /recordings');
             setTimeout(() => {
               window.location.href = '/recordings';
-            }, 1000);
+            }, 500);
           } else {
+            console.error('❌ Verification failed:', data);
             setStatus('error');
             setMessage(data.error || 'Verification failed. Please try again.');
           }
         }
       } catch (error) {
-        console.error('Authentication error:', error);
+        console.error('❌ Authentication error:', error);
         setStatus('error');
         setMessage('An error occurred during authentication. Please try again.');
       }

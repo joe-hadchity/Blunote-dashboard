@@ -1,6 +1,7 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
@@ -39,7 +40,9 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/images/logo/logo-icon.png" />
       </head>
       <body className={`${inter.className} dark:bg-gray-900`}>
-        <LoadingBar />
+        <Suspense fallback={null}>
+          <LoadingBar />
+        </Suspense>
         <AuthProvider>
           <ThemeProvider>
             <SidebarProvider>
